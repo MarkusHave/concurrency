@@ -7,40 +7,40 @@
 6. Copy the source code to Moodle return box.
 */
 
-
 #include <iostream>
 #include <thread>
 #include <process.h>
-#include <array>
+#include <vector>
 
 using namespace std;
 
 void threadFunction(int threadNum)
 {
-    for (int i = 0; i < 1000; i++)
-    {
-        cout << "Thread: " << threadNum << ", loop: " << i << endl;
-    }
+  for (int i = 0; i < 1000; i++)
+  {
+    cout << "Thread: " << threadNum << ", loop: " << i << endl;
+  }
 }
 
 int main()
 {
-    int processor_count = thread::hardware_concurrency();
-    cout << "Hardware concurrency: " << processor_count << endl;
-    array<thread, 4> threads;
+  const int processor_count = thread::hardware_concurrency();
+  cout << "Hardware concurrency: " << processor_count << endl;
+  vector<thread> threads;
 
-    // Create 4 thread objects into array
-    int i = 1;
-    for (auto& t : threads) 
-    {
-        t = thread(threadFunction, i);
-        i++;
-    }
+  threads.reserve(processor_count);
 
-    // Run all threads simultaneously
-    for (auto& t : threads) t.join();
+  // Create 4 thread objects into array
+  for (int i = 0; i < processor_count; i++)
+  {
+    threads.push_back(thread(threadFunction, i));
+  }
 
-    cout << "MAIN: all threads finished\n";
+  // Run all threads simultaneously
+  for (auto &t : threads)
+    t.join();
 
-    return 0;
+  cout << "MAIN: all threads finished\n";
+
+  return 0;
 }
